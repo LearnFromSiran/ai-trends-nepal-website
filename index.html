@@ -83,34 +83,64 @@
 
         async function fetchAIEntries() {
             const container = document.getElementById('news-container');
-            const timeEl = document.getElementById('update-time');
-
-            try {
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error("Failed to load news");
-                
-                const data = await response.json();
-                
-                timeEl.innerText = `Last Updated: ${data.lastUpdated}`;
-                container.innerHTML = data.articles.map(article => `
-                    <div class="news-card">
-                        <span class="tag">${article.tag}</span>
-                        <h3>${article.title}</h3>
-                        <p>${article.summary}</p>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error("Fetch error:", error);
-                container.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; color: red;">
-                        <p>⚠️ Unable to load news. Check if the backend is live.</p>
-                    </div>
-                `;
-            }
+        <script>
+    // Configuration
+    const API_URL = "https://your-app-url.up.railway.app/api/news";
+    
+    // Realistic Demo Data for Nepal AI Trends
+    const demoNews = [
+        {
+            tag: "Breaking",
+            title: "Nepal AI Strategy 2026 Framework Drafted",
+            summary: "The Ministry of Communication and IT has unveiled a new roadmap to integrate AI into public service delivery across Kathmandu and beyond."
+        },
+        {
+            tag: "AI Trends",
+            title: "Large Language Models Localized for Nepali Dialects",
+            summary: "Local tech startups are successfully fine-tuning open-source models to improve accuracy in Nepali, Maithili, and Bhojpuri translations."
+        },
+        {
+            tag: "Innovation",
+            title: "AI Hub Established in Pulchowk",
+            summary: "A new collaborative space for AI researchers has opened, focusing on using computer vision for agricultural optimization in the Terai region."
         }
+    ];
 
-        // Initialize on load
-        fetchAIEntries();
-    </script>
-</body>
-</html>
+    async function fetchAIEntries() {
+        const container = document.getElementById('news-container');
+        const timeEl = document.getElementById('update-time');
+
+        try {
+            // Attempt to fetch from real API
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error("Backend not ready");
+            
+            const data = await response.json();
+            renderNews(data.articles, data.lastUpdated);
+        } catch (error) {
+            console.log("Using demo data fallback...");
+            // Use current date as the timestamp for demo data
+            const today = new Date().toLocaleDateString('en-US', { 
+                month: 'long', day: 'numeric', year: 'numeric' 
+            });
+            renderNews(demoNews, today + " (Demo Mode)");
+        }
+    }
+
+    function renderNews(articles, timestamp) {
+        const container = document.getElementById('news-container');
+        const timeEl = document.getElementById('update-time');
+        
+        timeEl.innerText = `Last Updated: ${timestamp}`;
+        container.innerHTML = articles.map(article => `
+            <div class="news-card">
+                <span class="tag">${article.tag}</span>
+                <h3>${article.title}</h3>
+                <p>${article.summary}</p>
+            </div>
+        `).join('');
+    }
+
+    // Initialize
+    fetchAIEntries();
+</script>
